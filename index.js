@@ -1,71 +1,100 @@
-import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
+import express from "express";
+// import functions from 'firebase-functions'
+import { getCars, createCars, getCarById } from "./src/cars.js";
+import { createBuyers, getBuyerById, getBuyers } from "./src/buyers.js";
+import { getOrders, getOrdersById, createOrders } from "./src/orders.js";
+import { ObjectId } from "mongodb";
 
 dotenv.config();
-let _client;
 
-// connect to cluster to cache client connection;
-//function to keep using for each clientt
-// only create1 client, if already exits just return
-const createClient = async () => {
-  if (!_client) {
-    _client = new MongoClient(process.env.MONGO_URL);
-    await _client.connect();
+const app = express();
+app.use(express.json());
+
+/* ++++++++++ Get ALL ++++++++++*/
+app.get("/cars", async (req, res) => {
+  try {
+    let cars = await getCars(req.body);
+    res.status(200).send(cars);
+  } catch (err) {
+    res.status(500).send(err);
   }
-  return _client;
-};
+});
+app.get("/buyers", async (req, res) => {
+  try {
+    let buyers = await getBuyers(req.body);
+    res.status(200).send(buyers);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+app.get("/orders", async (req, res) => {
+  try {
+    let orders = await getOrders(req.body);
+    res.status(200).send(orders);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+/*+++++++++++++ Get by Id +++++++++++*/
+app.get("/cars/:id", async (req, res) => {
+  try {
+    const id = new ObjectId(req.params.id);
+    let cars = await getCarById(id);
+    res.status(200).send(cars);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+app.get("/buyers/:id", async (req, res) => {
+  try {
+    const id = new ObjectId(req.params.id);
+    let buyers = await getBuyerById(id);
+    res.status(200).send(buyers);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+app.get("/orders/:id", async (req, res) => {
+  try {
+    const id = new ObjectId(req.params.id);
+    let orders = await getOrdersById(id);
+    res.status(200).send(orders);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+/*+++++++++++++ Post +++++++++++++++*/
+app.post("/cars", async (req, res) => {
+  try {
+    let cars = await createCars(req.body);
+    res.status(201).send(cars);
+  } catch (err) {
+    res.status(500).send(err);
+    console.log(err);
+  }
+});
+app.post("/buyers", async (req, res) => {
+  try {
+    let buyers = await createBuyers(req.body);
+    res.status(201).send(buyers);
+  } catch (err) {
+    res.status(500).send(err);
+    console.log(err);
+  }
+});
+app.post("/orders", async (req, res) => {
+  try {
+    let carID = new ObjectId(req.body.carID)
+    let buyerID = new ObjectId(req.body.buyerID)
+    let orders = await createOrders({carID,buyerID, date: new Date()});
+    res.status(201).send(orders);
+  } catch (err) {
+    res.status(500).send(err);
+    console.log(err);
+  }
+});
 
-const getUserCollection = async () => {
-  const client = await createClient();
-  const db = client.db("db2");
-  return db.collection("user");
-};
+// exports.app = functions.https.onRequest(app)
 
-//
-const createUser = async ({ name, dob, email }) => {
-  const userCollection = await getUserCollection();
-  await userCollection.insertOne({ name, dob, email });
-  return { name, dob, email };
-};
-
-const run = async () => {
-  const client = await createClient();
-  await createUser({
-    name: "Juan",
-    dob: new Date("02/26/1997"),
-    email: "jy@hotmail.com",
-  })
-  await client.close();
-};
-
-run().then();
-
-/*
-
-const createUser = async ({name, dob, email}) => {
-  const client = await createClient()
-
-}
-const createUser = async ({name, dob, email}) => {
-  const client = await createClient()
-
-}
-const createUser = async ({name, dob, email}) => {
-  const client = await createClient()
-
-}
-
-
-
-createClient().then();
-
-// try {
-//   client = await createClient()
-
-//   if(!client){
-//       console.error("Something went horribly wrong")
-//     }
-//   }
-//  catch (error) {
-//   console.log("Oh No no no no no.", error)
-// } */
+app.listen(3000, () => console.log("listening on port 3000"));
