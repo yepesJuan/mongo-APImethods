@@ -1,5 +1,5 @@
 import { createClient } from "./client.js";
-import { getOrdersById } from "./orders.js";
+//import { getOrdersById } from "./orders.js";
 
 const getCarsCollection = async () => {
   const dealer = await createClient();
@@ -27,15 +27,15 @@ export const createCars = async ({ make, model, price }) => {
   // return { make, model, price };
 };
 
-// export const updateCars = async (id, { make, model, price }) => {
-//   const carsCollection = await getCarsCollection();
-//   const ret = await carsCollection.updateOne({ _id: id },{ make, model, price });
-//   return ret;
-// };
+export const updateCars = async (id, { make, model, price }) => {
+  const carsCollection = await getCarsCollection();
+  const ret = await carsCollection.updateOne({ _id: id },{$set :{ make, model, price }});
+  return ret;
+};
 
-// export const updateCars = async (id) => {
-//   const carsCollection = await getCarsCollection();
-//   const ret = await carsCollection.deleteOne(id)
-//   return ret;
-// };
+export const deleteCars = async (id) => {
+  const carsCollection = await getCarsCollection();
+  const ret = await carsCollection.deleteOne(id)
+  return ret;
+};
 

@@ -23,3 +23,15 @@ export const createBuyers = async ({ name, address, phone }) => {
   const ret = await buyersCollection.insertOne({ name, address, phone });
   return ret.insertedId;
 };
+
+export const updateBuyers = async (id, { name, address, phone }) => {
+  const buyersCollection = await getBuyersCollection();
+  const ret = await buyersCollection.updateOne({ _id: id },{$set :{ name, address, phone }});
+  return ret;
+};
+
+export const deleteBuyers = async (id) => {
+  const buyersCollection = await getBuyersCollection();
+  const ret = await buyersCollection.deleteOne(id)
+  return ret;
+};

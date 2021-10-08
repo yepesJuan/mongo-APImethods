@@ -23,3 +23,15 @@ export const createOrders = async ({ date, carID, buyerID }) => {
   const ret = await ordersCollection.insertOne({ date, carID, buyerID });
   return ret.insertedId;
 };
+
+export const updateOrders = async (id, carID, buyerID, date  ) => {
+  const ordersCollection = await getOrdersCollection();
+  const ret = await ordersCollection.updateOne({ _id: id},{$set:{ date, carID, buyerID } } );
+  return ret;
+};
+
+export const deleteOrders = async (id) => {
+  const ordersCollection = await getOrdersCollection();
+  const ret = await ordersCollection.deleteOne({_id: id})
+  console.log("deleted")
+};
